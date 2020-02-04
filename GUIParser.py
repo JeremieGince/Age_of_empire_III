@@ -25,6 +25,10 @@ class GuiItem:
 
     @property
     def center(self) -> tuple:
+        """
+        Property -> Center position of the current Gui item
+        :return: (x, y)
+        """
         return self.box[0] + self.box[2]/2, self.box[1] + self.box[3]/2
 
     @property
@@ -45,8 +49,16 @@ class GuiItem:
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
 
+    def click(self):
+        """
+        Perform a click on the Gui item
+        :return: None
+        """
+        x, y = self.center
+        pyautogui.click(x, y)
 
-class InGameGUIParser:
+
+class GUIParser:
     def __init__(self):
         pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
         self.GuiItems: dict = dict()
@@ -77,7 +89,7 @@ class InGameGUIParser:
         return self.GuiItems.items()
 
 
-class IGameAoE3GUIParser(InGameGUIParser):
+class IGameAoE3GUIParser(GUIParser):
     icons_dir: str = os.getcwd() + r"\Icons"
 
     def setIcons(self):

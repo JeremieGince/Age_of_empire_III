@@ -91,6 +91,7 @@ class AoE3Environment(GameEnvironment):
             self.GuiItems_updates["HmIdleVillagerSlot"] = self.Iteration
 
 
+GameEnv = GameEnvironment
 AoE3Env = AoE3Environment
 
 

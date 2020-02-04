@@ -45,7 +45,8 @@ class GuiItem:
         return this
 
     def show(self):
-        cv2.imshow(self.name, np.array(self.img))
+        gray = -cv2.cvtColor(np.array(self.img), cv2.COLOR_RGB2GRAY)
+        cv2.imshow(self.name, np.array(gray))
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
 
@@ -89,7 +90,7 @@ class GUIParser:
         return self.GuiItems.items()
 
 
-class IGameAoE3GUIParser(GUIParser):
+class InGameAoE3GUIParser(GUIParser):
     icons_dir: str = os.getcwd() + r"\Icons"
 
     def setIcons(self):
@@ -112,7 +113,7 @@ class IGameAoE3GUIParser(GUIParser):
         for resource, slotName in resources.items():
             resourceIconPos: tuple = self[resource].region
             slot = GuiItem(name=slotName, region=(resourceIconPos[0] + resourceIconPos[2], resourceIconPos[1],
-                                                  resourceIconPos[2] * 2, resourceIconPos[3]),
+                                                  resourceIconPos[2] * 1.9, resourceIconPos[3]),
                            char_whitelist="0123456789")
             self.addItem(slot)
 
@@ -140,7 +141,7 @@ if __name__ == '__main__':
     import time
 
     time.sleep(1)
-    InGameGui = IGameAoE3GUIParser()
+    InGameGui = InGameAoE3GUIParser()
     for _ in range(10):
         for name, item in InGameGui.items():
             item.show()

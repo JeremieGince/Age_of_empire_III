@@ -4,6 +4,7 @@ import pytesseract
 import cv2
 import numpy as np
 from PIL import Image
+from InGameGUIParser import IGameAoE3GUIParser
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
@@ -13,6 +14,7 @@ class GameEnvironment:
 
     def __init__(self, botInstance):
         self._iteration: int = 0
+        self.InGameGui = IGameAoE3GUIParser()
 
         self._bot = botInstance
         self._bot.setGameEnv(self)
@@ -83,9 +85,9 @@ class GameEnvironment:
                 self._gold = int(float(text))
             except Exception:
                 pass
-        # cv2.imshow("dodu", np.array(goldText))
-        # if cv2.waitKey(25) & 0xFF == ord('q'):
-        #     cv2.destroyAllWindows()
+        cv2.imshow("dodu", np.array(goldText))
+        if cv2.waitKey(25) & 0xFF == ord('q'):
+            cv2.destroyAllWindows()
 
     def updateHmVillager(self):
         resourcePos = pyautogui.locateOnScreen(f"Icons/Villagers.PNG", confidence=0.9, grayscale=True)

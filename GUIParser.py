@@ -131,10 +131,14 @@ class InGameAoE3GUIParser(GUIParser):
                            char_whitelist="0123456789")
             self.addItem(slot)
 
+    def setMapItem(self):
+        pass
+
     def setGuiItems(self):
         self.setIcons()
         self.setResourceSlots()
         self.setResourceCollectorsSlots()
+        self.setMapItem()
 
 
 if __name__ == '__main__':

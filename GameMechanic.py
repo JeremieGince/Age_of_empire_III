@@ -1,5 +1,6 @@
 import os, time
 from GUIParser import InGameAoE3GUIParser
+import Hotkeys
 
 
 class GameEnvironment:
@@ -89,6 +90,10 @@ class AoE3Environment(GameEnvironment):
         if hmVillagerStr:
             self._food = int(hmVillagerStr)
             self.GuiItems_updates["HmIdleVillagerSlot"] = self.Iteration
+
+    @staticmethod
+    def selectIdleVillager():
+        return Hotkeys.Find_idle_Villager()
 
 
 GameEnv = GameEnvironment

@@ -19,6 +19,7 @@ class Bot(BotAi):
 
 
 if __name__ == '__main__':
+    # run as admin -> https://stackoverflow.com/questions/19672352/how-to-run-python-script-with-elevated-privilege-on-windows
     os.system("python OpenGame.py")
     # time.sleep(60)
     time.sleep(1)
@@ -43,7 +44,7 @@ if __name__ == '__main__':
     #         cv2.destroyAllWindows()
     #         break
 
-    # Jarex = Bot("Jarex")
-    # gameEnv = GameEnv(Jarex)
-    # gameEnv.run()
+    Jarex = Bot("Jarex")
+    gameEnv = GameEnv(Jarex)
+    gameEnv.run()
 

@@ -141,6 +141,8 @@ if __name__ == '__main__':
 
     time.sleep(1)
     InGameGui = IGameAoE3GUIParser()
-    while True:
+    for _ in range(10):
         for name, item in InGameGui.items():
             item.show()
+
+    InGameGui["FoodCollectorsSlot"].click()

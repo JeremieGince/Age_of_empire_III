@@ -1,5 +1,6 @@
+import pyautogui
 
 
-Hotkeys: dict = {
-    "Find_idle_Villager": ["."]
-}
+def Find_idle_Villager():
+    pyautogui.hotkey(".")
+

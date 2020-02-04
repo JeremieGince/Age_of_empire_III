@@ -4,14 +4,10 @@ import pytesseract
 import cv2
 import numpy as np
 from PIL import Image
-from InGameGUIParser import IGameAoE3GUIParser
-
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+from GUIParser import IGameAoE3GUIParser
 
 
 class GameEnvironment:
-    digitsNumber: set = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'}
-
     def __init__(self, botInstance):
         self._iteration: int = 0
         self.InGameGui = IGameAoE3GUIParser()
@@ -45,18 +41,19 @@ class GameEnvironment:
         return self._iteration
 
     def updateFood(self):
-        foodPos = pyautogui.locateOnScreen("Icons/Food.PNG", confidence=0.9, grayscale=True)
-        foodText = pyautogui.screenshot(region=(foodPos[0] + foodPos[2], foodPos[1], foodPos[2] * 1.5, foodPos[3]))
-        foodText = -cv2.cvtColor(np.array(foodText), cv2.COLOR_RGB2GRAY)
-        text = pytesseract.image_to_string(Image.fromarray(foodText), config='--psm 13 --oem 3 -c tessedit_char_whitelist=0123456789')
+        # foodPos = pyautogui.locateOnScreen("Icons/Food.PNG", confidence=0.9, grayscale=True)
+        # foodText = pyautogui.screenshot(region=(foodPos[0] + foodPos[2], foodPos[1], foodPos[2] * 1.5, foodPos[3]))
+        # foodText = -cv2.cvtColor(np.array(foodText), cv2.COLOR_RGB2GRAY)
+        # text = pytesseract.image_to_string(Image.fromarray(foodText), config='--psm 13 --oem 3 -c tessedit_char_whitelist=0123456789')
         # for digit in text:
         #     if digit not in GameEnvironment.digitsNumber:
         #         text.replace(digit, '')
-        if text:
-            try:
-                self._food = int(float(text))
-            except Exception:
-                pass
+        # if text:
+        #     try:
+        #         self._food = int(float(text))
+        #     except Exception:
+        #         pass
+        self._food = int(str(self.InGameGui["FoodSlot"]))
 
     def updateWood(self):
         woodPos = pyautogui.locateOnScreen("Icons/Wood.PNG", confidence=0.9, grayscale=True)
@@ -125,9 +122,9 @@ class GameEnvironment:
 
     def updateResources(self):
         self.updateFood()
-        self.updateWood()
-        self.updateGold()
-        self.updateHmVillager()
+        # self.updateWood()
+        # self.updateGold()
+        # self.updateHmVillager()
         print(f"Food: {self.Food}, Wood: {self.Wood}, Gold: {self.Gold}, HmVillager: {self.HmVillager}")
 
     def run(self):

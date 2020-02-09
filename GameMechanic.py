@@ -1,6 +1,7 @@
 import os, time
-from GUIParser import InGameAoE3GUIParser
+from GUIParser import InGameAoE3GUIParser, GuiItem
 import Hotkeys
+from Units import *
 
 
 class GameEnvironment:
@@ -17,10 +18,9 @@ class GameEnvironment:
         return self._iteration
 
     def run(self):
+        time.sleep(3)
         self._bot.onStart()
-        time.sleep(5)
         while self.Iteration <= 1_000:
-            print(f"iteration: {self.Iteration}")
             self._bot.onStep()
 
             self._iteration += 1
@@ -74,26 +74,46 @@ class AoE3Environment(GameEnvironment):
         woodStr = repr(self.InGameGui["WoodSlot"])
         # self.InGameGui["WoodSlot"].show()
         if woodStr:
-            self._food = int(woodStr)
+            self._wood = int(woodStr)
             self.GuiItems_updates["WoodSlot"] = self.Iteration
 
     def updateGoldSlot(self):
-        hmVillagerStr = repr(self.InGameGui["GoldSlot"])
+        goldStr = repr(self.InGameGui["GoldSlot"])
         # self.InGameGui["GoldSlot"].show()
-        if hmVillagerStr:
-            self._food = int(hmVillagerStr)
+        if goldStr:
+            self._gold = int(goldStr)
             self.GuiItems_updates["GoldSlot"] = self.Iteration
 
     def updateHmVillagerSlot(self):
         hmVillagerStr = repr(self.InGameGui["HmIdleVillagerSlot"])
         # self.InGameGui["HmIdleVillagerSlot"].show()
         if hmVillagerStr:
-            self._food = int(hmVillagerStr)
+            self._hmVillager = int(hmVillagerStr)
             self.GuiItems_updates["HmIdleVillagerSlot"] = self.Iteration
 
-    @staticmethod
-    def selectIdleVillager():
-        return Hotkeys.Find_idle_Villager()
+    def getDeckCard(self, CardName: str):
+        Hotkeys.SendHotKeys("Find Home City")
+        if CardName not in self.InGameGui.items():
+            self.InGameGui.addItem(GuiItem(f"{CardName}", None, IconPath=os.getcwd()+f"/DeckCards/{CardName}.PNG"))
+
+        card = self.InGameGui[CardName]
+        card.click()
+        return 60
+
+    def selectIdleVillager(self):
+        Hotkeys.Find_idle_Villager()
+        unitIcon = Unit.UnitIconsDirectory+self._bot.civ+"/Villager.PNG"
+        return Villager(unitIcon, self.InGameGui) if self.InGameGui.imgIn(unitIcon) else None
+
+    def selectMarket(self):
+        Hotkeys.SendHotKeys("Find Market")
+        unitIcon = Unit.UnitIconsDirectory+self._bot.civ+"/Market.PNG"
+        return Market(unitIcon, self.InGameGui) if self.InGameGui.imgIn(unitIcon) else None
+
+    def selectMill(self):
+        Hotkeys.SendHotKeys("Find Mill")
+        unitIcon = Unit.UnitIconsDirectory + self._bot.civ + "/Mill.PNG"
+        return Mill(unitIcon, self.InGameGui) if self.InGameGui.imgIn(unitIcon) else None
 
 
 GameEnv = GameEnvironment
@@ -101,9 +121,10 @@ AoE3Env = AoE3Environment
 
 
 class BotAi:
-    def __init__(self, name: str):
+    def __init__(self, name: str, civ: str):
         self.GameEnv = None
         self.name: str = name
+        self.civ: str = civ
 
     @property
     def Food(self) -> int:

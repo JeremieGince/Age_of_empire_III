@@ -11,19 +11,10 @@ from Units import *
 class Bot(BotAi):
     def onStart(self):
         print(len(self.GameEnv.InGameGui))
-        # idlv = self.GameEnv.selectIdleVillager()
-        # if self.GameEnv.selectMarket() is None:
-        #     idlv.BuildMarket()
 
     def onStep(self):
         print(f"iteration: {self.Iteration}")
         print(self.Food, self.Wood, self.Gold)
-        # for i in range(4):
-        #     market = self.GameEnv.selectMarket()
-        #     if self.Gold > 200:
-        #         market.BuyWoodWithGold()
-        #     if self.Food > 100:
-        #         market.BuyGoldWithFood()
 
         if self.Iteration == 1:
             # construction of the first town
@@ -62,7 +53,6 @@ if __name__ == '__main__':
     # run as admin -> https://stackoverflow.com/questions/19672352/how-to-run-python-script-with-elevated-privilege-on-windows
     # os.system("python OpenGame.py")
     # time.sleep(60)
-    # time.sleep(1)
 
     Jarex = Bot("Jarex", "British")
     gameEnv = AoE3Env(Jarex)

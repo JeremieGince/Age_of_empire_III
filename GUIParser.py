@@ -8,9 +8,12 @@ import pytesseract
 
 class GuiItem:
     def __init__(self, name: str, region: tuple, **kwargs):
-        assert len(region) == 4
-
         self.name: str = name
+
+        if region is None:
+            assert "IconPath" in kwargs
+            region = pyautogui.locateOnScreen(kwargs.get("IconPath"), confidence=0.9, grayscale=True)
+        assert len(region) == 4
         self.region: tuple = region  # (left, top, width, height)
 
         self.char_whitelist = kwargs.get("char_whitelist")
@@ -89,6 +92,14 @@ class GUIParser:
     def items(self):
         return self.GuiItems.items()
 
+    def __len__(self) -> int:
+        return len(self.GuiItems)
+
+    @staticmethod
+    def imgIn(imgPath: str) -> bool:
+        region = pyautogui.locateOnScreen(imgPath, confidence=0.5, grayscale=True)
+        return region is not None
+
 
 class InGameAoE3GUIParser(GUIParser):
     icons_dir: str = os.getcwd() + r"\Icons"
@@ -99,7 +110,7 @@ class InGameAoE3GUIParser(GUIParser):
             if filename.endswith(extension):
                 IconPath = os.path.join(self.icons_dir, filename)
                 guiItem = GuiItem(name=filename.replace(extension, '')+"Icon",
-                                  region=pyautogui.locateOnScreen(IconPath, confidence=0.7, grayscale=True),
+                                  region=pyautogui.locateOnScreen(IconPath, confidence=0.8, grayscale=True),
                                   IconPath=IconPath)
                 self.addItem(guiItem)
 
@@ -131,6 +142,14 @@ class InGameAoE3GUIParser(GUIParser):
                            char_whitelist="0123456789")
             self.addItem(slot)
 
+    def setOptionsSlots(self):
+        OptionsRegion = self["OptionsSlotsIcon"].box
+        width, height = self["OptionSlotIcon"].box.width, self["OptionSlotIcon"].box.height
+        for i in range(18):
+            option = GuiItem(name=f"OptionSlot{i}", region=(OptionsRegion[0] + (i%6+2.7)*(OptionsRegion[2]/8.5),
+                                                            OptionsRegion[1] + height*(i//6), width, height))
+            self.addItem(option)
+
     def setMapItem(self):
         pass
 
@@ -138,6 +157,7 @@ class InGameAoE3GUIParser(GUIParser):
         self.setIcons()
         self.setResourceSlots()
         self.setResourceCollectorsSlots()
+        self.setOptionsSlots()
         self.setMapItem()
 
 

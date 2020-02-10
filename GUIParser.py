@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 from PIL import Image
 import pytesseract
+import time
+import util
 
 
 class GuiItem:
@@ -40,16 +42,18 @@ class GuiItem:
 
     def __repr__(self):
         gray = -cv2.cvtColor(np.array(self.img), cv2.COLOR_RGB2GRAY)
+        threshold = util.thresholding(gray)
         if self.char_whitelist is not None:
-            this = pytesseract.image_to_string(Image.fromarray(gray),
+            this = pytesseract.image_to_string(Image.fromarray(threshold),
                                                config=f'--psm 13 --oem 3 -c tessedit_char_whitelist={self.char_whitelist}')
         else:
-            this = pytesseract.image_to_string(Image.fromarray(gray))
+            this = pytesseract.image_to_string(Image.fromarray(threshold))
         return this
 
     def show(self):
         gray = -cv2.cvtColor(np.array(self.img), cv2.COLOR_RGB2GRAY)
-        cv2.imshow(self.name, np.array(gray))
+        threshold = util.thresholding(gray)
+        cv2.imshow(self.name, np.array(threshold))
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
 
@@ -67,6 +71,9 @@ class GUIParser:
         pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
         self.GuiItems: dict = dict()
         self.setGuiItems()
+
+        # https://automatetheboringstuff.com/2e/chapter20/
+        self.activeWindow = pyautogui.getActiveWindow()
 
     def setGuiItems(self):
         raise NotImplementedError()
@@ -154,11 +161,16 @@ class InGameAoE3GUIParser(GUIParser):
         pass
 
     def setGuiItems(self):
-        self.setIcons()
-        self.setResourceSlots()
-        self.setResourceCollectorsSlots()
-        self.setOptionsSlots()
-        self.setMapItem()
+        try:
+            self.setIcons()
+            self.setResourceSlots()
+            self.setResourceCollectorsSlots()
+            self.setOptionsSlots()
+            self.setMapItem()
+        except TypeError:
+            print("--- setGuiItems --- Failed. Trying again in 5 s.")
+            time.sleep(5)
+            self.setGuiItems()
 
 
 if __name__ == '__main__':

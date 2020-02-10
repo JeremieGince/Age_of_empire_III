@@ -4,6 +4,12 @@ import time
 tempGroup = 9
 
 HandleToHotKeys: dict = {
+    # Game world Hotkeys
+    "Move Camera Left": ["left"],
+    "Move Camera Right": ["right"],
+    "Move Camera Forward": ["up"],
+    "Move Camera Backward": ["down"],
+
     # Find Unit Hotkeys
     "Find idle Villager": ["."],
     "Find Explorer": ["é"],
@@ -24,7 +30,7 @@ HandleToHotKeys: dict = {
     "Create temp Group": ["CTRL", str(tempGroup)],
     "Create Group 9": ["CTRL", "9"],
 
-     # Town Center Hotkeys
+    # Town Center Hotkeys
     "Train Villager": ["v"],
 }
 

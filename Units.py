@@ -3,15 +3,16 @@ import os
 import Hotkeys
 import pyautogui
 from GUIParser import GUIParser
+from GameMechanic import GameEnv, AoE3Env
 
 
 class Unit:
     UnitIconsDirectory: str = fr"{os.getcwd()}/UnitIcons/"
 
-    def __init__(self, name: str, IconPath: str, GameGui: GUIParser):
+    def __init__(self, name: str, IconPath: str, gameEnv: GameEnv):
         self.name = name
         self.IconPath = IconPath
-        self.GameGui = GameGui
+        self.gameEnv = gameEnv
 
     @property
     def img(self):
@@ -32,21 +33,20 @@ class Units(list):
 
 
 class Wagon(Unit):
-    def __init__(self, IconPath: str, GameGui: GUIParser):
-        super(Wagon, self).__init__("Wagon", IconPath, GameGui)
+    def __init__(self, IconPath: str, gameEnv: GameEnv):
+        super(Wagon, self).__init__("Wagon", IconPath, gameEnv)
 
     @staticmethod
     def BuildTownCenter():
         Hotkeys.SendHotKeys("Find Wagon")
         Hotkeys.SendHotKeys("Build Town Center")
-        center = pyautogui.size()[0]//2, pyautogui.size()[1]//2
-        pyautogui.leftClick(*center)
+        AoE3Env.build()
         return 30
 
 
 class TownCenter(Unit):
-    def __init__(self, IconPath: str, GameGui: GUIParser):
-        super(TownCenter, self).__init__("TownCenter", IconPath, GameGui)
+    def __init__(self, IconPath: str, gameEnv: GameEnv):
+        super(TownCenter, self).__init__("TownCenter", IconPath, gameEnv)
 
     @staticmethod
     def TrainVillager():
@@ -56,20 +56,19 @@ class TownCenter(Unit):
 
 
 class Villager(Unit):
-    def __init__(self, IconPath: str, GameGui: GUIParser):
-        super(Villager, self).__init__("Villager", IconPath, GameGui)
+    def __init__(self, IconPath: str, gameEnv: GameEnv):
+        super(Villager, self).__init__("Villager", IconPath, gameEnv)
 
     @staticmethod
     def BuildMarket():
         Hotkeys.SendHotKeys("Build Market")
-        pyautogui.leftClick()
+        AoE3Env.build()
         return 30  # elapse time tu build [s]
 
     @staticmethod
     def BuildMill():
-        # TODO: Make a new Class Builder to construct new building
         Hotkeys.SendHotKeys("Build Mill")
-        pyautogui.leftClick()  # may add several clicks to a random variance location
+        AoE3Env.build()
         return 30  # elapse time tu build [s]
 
     @staticmethod
@@ -78,37 +77,38 @@ class Villager(Unit):
         Hotkeys.SendHotKeys("Create temp Group")
         Hotkeys.SendHotKeys("Find Mill")
         Hotkeys.SendHotKeys("Select temp Group")
-        pyautogui.rightClick(pyautogui.size()[0]//2, pyautogui.size()[1]//2)
+        AoE3Env.madeCrossSearch(["GameMessages/Mill_Food_building.PNG"], func=pyautogui.rightClick)
+        pyautogui.hotkey("esc")
 
 
 class Market(Unit):
-    def __init__(self, IconPath: str, GameGui: GUIParser):
-        super(Market, self).__init__("Market", IconPath, GameGui)
+    def __init__(self, IconPath: str, gameEnv: GameEnv):
+        super(Market, self).__init__("Market", IconPath, gameEnv)
 
     def BuyFoodWithGold(self):
         Hotkeys.SendHotKeys("Find Market")
-        self.GameGui["OptionSlot6"].click()
+        self.gameEnv.InGameGui["OptionSlot6"].click()
 
     def BuyWoodWithGold(self):
         Hotkeys.SendHotKeys("Find Market")
-        self.GameGui["OptionSlot7"].click()
+        self.gameEnv.InGameGui["OptionSlot7"].click()
 
     def BuyGoldWithFood(self):
         Hotkeys.SendHotKeys("Find Market")
-        self.GameGui["OptionSlot12"].click()
+        self.gameEnv.InGameGui["OptionSlot12"].click()
 
     def BuyGoldWithWood(self):
         Hotkeys.SendHotKeys("Find Market")
-        self.GameGui["OptionSlot13"].click()
+        self.gameEnv.InGameGui["OptionSlot13"].click()
 
 
 class Mill(Unit):
-    def __init__(self, IconPath: str, GameGui: GUIParser):
-        super(Mill, self).__init__("Mill", IconPath, GameGui)
+    def __init__(self, IconPath: str, gameEnv: GameEnv):
+        super(Mill, self).__init__("Mill", IconPath, gameEnv)
 
     def Improve(self):
         Hotkeys.SendHotKeys("Find Mill")
-        self.GameGui["OptionSlot0"].click()
+        self.gameEnv.InGameGui["OptionSlot0"].click()
 
 
 if __name__ == '__main__':

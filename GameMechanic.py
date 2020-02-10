@@ -1,7 +1,8 @@
 import os, time
 from GUIParser import InGameAoE3GUIParser, GuiItem
 import Hotkeys
-from Units import *
+import pyautogui
+import util
 
 
 class GameEnvironment:
@@ -94,26 +95,78 @@ class AoE3Environment(GameEnvironment):
     def getDeckCard(self, CardName: str):
         Hotkeys.SendHotKeys("Find Home City")
         if CardName not in self.InGameGui.items():
-            self.InGameGui.addItem(GuiItem(f"{CardName}", None, IconPath=os.getcwd()+f"/DeckCards/{CardName}.PNG"))
+            try:
+                self.InGameGui.addItem(GuiItem(f"{CardName}", None, IconPath=os.getcwd()+f"/DeckCards/{CardName}.PNG"))
+            except TypeError:
+                time.sleep(1)
+                self.InGameGui.addItem(GuiItem(f"{CardName}", None, IconPath=os.getcwd()+f"/DeckCards/{CardName}.PNG"))
 
         card = self.InGameGui[CardName]
         card.click()
         return 60
 
     def selectIdleVillager(self):
+        from Units import Unit, Villager
         Hotkeys.Find_idle_Villager()
         unitIcon = Unit.UnitIconsDirectory+self._bot.civ+"/Villager.PNG"
-        return Villager(unitIcon, self.InGameGui) if self.InGameGui.imgIn(unitIcon) else None
+        return Villager(unitIcon, self) if self.InGameGui.imgIn(unitIcon) else None
 
     def selectMarket(self):
+        from Units import Unit, Market
         Hotkeys.SendHotKeys("Find Market")
         unitIcon = Unit.UnitIconsDirectory+self._bot.civ+"/Market.PNG"
-        return Market(unitIcon, self.InGameGui) if self.InGameGui.imgIn(unitIcon) else None
+        return Market(unitIcon, self) if self.InGameGui.imgIn(unitIcon) else None
 
     def selectMill(self):
+        from Units import Unit, Mill
         Hotkeys.SendHotKeys("Find Mill")
         unitIcon = Unit.UnitIconsDirectory + self._bot.civ + "/Mill.PNG"
-        return Mill(unitIcon, self.InGameGui) if self.InGameGui.imgIn(unitIcon) else None
+        return Mill(unitIcon, self) if self.InGameGui.imgIn(unitIcon) else None
+
+    @staticmethod
+    def build():
+        from GUIParser import GUIParser
+        center = pyautogui.size()[0] // 2, pyautogui.size()[1] // 2
+        pyautogui.moveTo(*center)
+        errorMess_paths = [fr"GameMessages/Other_objects_prevent_you_from_placing_this_here.PNG",
+                           fr"GameMessages/You_must_explore_this_area_before_placing_items_there.PNG",
+                           fr"GameMessages/This_building_has_corps_around_it_You_need_to_allow_more_space.PNG",
+                           fr"GameMessages/You_may_not_obstruct_a_Trade_Route.PNG"]
+
+        # search = AoE3Env.madeCrossSearch(errorMess_paths, func=pyautogui.leftClick, sleep=0.7)
+        # if search is not None:
+        #     return None
+
+        while any([GUIParser.imgIn(mess) for mess in errorMess_paths]):
+            direction: str = util.randomDirection(("left", "right", "up", "down"))
+            pyautogui.keyDown(direction)
+            util.randomSleep(b=0.2)
+            pyautogui.keyUp(direction)
+            pyautogui.press(direction)
+
+        pyautogui.leftClick()
+        pyautogui.hotkey("esc")
+
+    @staticmethod
+    def madeCrossSearch(pathsToFind: list, variances: tuple = (50, 100, 150), func=pyautogui.rightClick, sleep: float = 1.0):
+        import time
+        from GUIParser import GUIParser
+        center = pyautogui.size()[0] // 2, pyautogui.size()[1] // 2
+        pyautogui.moveTo(*center)
+        searchPositions: list = list()
+        for var in variances:
+            searchPositions.extend([(center[0], center[1]+var),
+                                    (center[0]+var, center[1]),
+                                    (center[0], center[1]-var),
+                                    (center[0]-var, center[1])])
+
+        for searchPos in searchPositions:
+            pyautogui.moveTo(searchPos)
+            time.sleep(sleep)
+            if any([GUIParser.imgIn(path) for path in pathsToFind]):
+                func()
+                return searchPos
+        return None
 
 
 GameEnv = GameEnvironment

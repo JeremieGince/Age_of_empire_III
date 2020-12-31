@@ -4,19 +4,25 @@ import pytesseract
 import cv2
 import numpy as np
 from PIL import Image
-from GameMechanic import AoE3Env, BotAi
+from GameMechanic import AoE3Env, AoE3yBotAi
 from Units import Unit, Units, Villager, Mill, TownCenter, Market, Wagon
 
 
-class Bot(BotAi):
+class Bot(AoE3yBotAi):
+
     def onStart(self):
         print(len(self.GameEnv.InGameGui))
 
     def onStep(self):
-        print(f"iteration: {self.Iteration}")
+        print(f"Age: {self.Age}, Iteration: {self.Iteration}")
         print(self.Food, self.Wood, self.Gold)
 
-        self.GameEnv.InGameGui["FoodSlot"].show()
+        # self.GameEnv.InGameGui["FoodCollectorsSlot"].show()
+        # self.GameEnv.InGameGui["WoodCollectorsSlot"].show()
+        # self.GameEnv.InGameGui["GoldCollectorsSlot"].show()
+        self.GameEnv.InGameGui["AgeSlot"].show()
+        # self.GameEnv.InGameGui["MenuButton"].show()
+        # self.GameEnv.InGameGui["Map"].show()
 
         # if self.Iteration == 1:
         #     # construction of the first town
@@ -47,6 +53,9 @@ class Bot(BotAi):
         #     if self.Food >= 500 and self.Food >= 4*self.Gold:
         #         market = self.GameEnv.selectMarket()
         #         market.BuyGoldWithFood()
+        # if self.GameEnv.selectIdleVillager() is not None:
+        #     Villager.WorkOnMill()
+        super(Bot, self).onStep()
 
     def onEnd(self):
         pass

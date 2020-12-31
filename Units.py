@@ -2,7 +2,7 @@ import cv2
 import os
 import Hotkeys
 import pyautogui
-from GUIParser import GUIParser
+from GUIParser import GUIParser, GuiItem
 from GameMechanic import GameEnv, AoE3Env
 
 
@@ -33,7 +33,7 @@ class Units(list):
 
 
 class Wagon(Unit):
-    def __init__(self, IconPath: str, gameEnv: GameEnv):
+    def __init__(self, IconPath: str, gameEnv: AoE3Env):
         super(Wagon, self).__init__("Wagon", IconPath, gameEnv)
 
     @staticmethod
@@ -45,7 +45,7 @@ class Wagon(Unit):
 
 
 class TownCenter(Unit):
-    def __init__(self, IconPath: str, gameEnv: GameEnv):
+    def __init__(self, IconPath: str, gameEnv: AoE3Env):
         super(TownCenter, self).__init__("TownCenter", IconPath, gameEnv)
 
     @staticmethod
@@ -54,9 +54,18 @@ class TownCenter(Unit):
         Hotkeys.SendHotKeys("Train Villager")
         return 1
 
+    def ImproveAge(self) -> bool:
+        Hotkeys.SendHotKeys("Find Town Center")
+        self.gameEnv.InGameGui["OptionSlot6"].click()
+        acceptButtonPosition = GUIParser.locate("Buttons/Accept.png", center=True)
+        if acceptButtonPosition is not None:
+            self.gameEnv.InGameGui.click(*acceptButtonPosition)
+        Hotkeys.SendHotKeys("Deselect All")
+        return acceptButtonPosition is not None
+
 
 class Villager(Unit):
-    def __init__(self, IconPath: str, gameEnv: GameEnv):
+    def __init__(self, IconPath: str, gameEnv: AoE3Env):
         super(Villager, self).__init__("Villager", IconPath, gameEnv)
 
     @staticmethod
@@ -77,12 +86,20 @@ class Villager(Unit):
         Hotkeys.SendHotKeys("Create temp Group")
         Hotkeys.SendHotKeys("Find Mill")
         Hotkeys.SendHotKeys("Select temp Group")
-        AoE3Env.madeCrossSearch(["GameMessages/Mill_Food_building.PNG"], func=pyautogui.rightClick)
+        AoE3Env.PerformCrossSearch(["GameMessages/Mill_Food_building.PNG"], func=pyautogui.rightClick)
+        pyautogui.hotkey("esc")
+
+    def WorkOnSilverMine(self):
+        Hotkeys.SendHotKeys("Find idle Villager")
+        Hotkeys.SendHotKeys("Create temp Group")
+        self.gameEnv.findSilverMine()
+        Hotkeys.SendHotKeys("Select temp Group")
+        AoE3Env.PerformCrossSearch(["GameMessages/Silver_Mine_Coin_source.PNG"], func=pyautogui.rightClick)
         pyautogui.hotkey("esc")
 
 
 class Market(Unit):
-    def __init__(self, IconPath: str, gameEnv: GameEnv):
+    def __init__(self, IconPath: str, gameEnv: AoE3Env):
         super(Market, self).__init__("Market", IconPath, gameEnv)
 
     def BuyFoodWithGold(self):
@@ -103,12 +120,17 @@ class Market(Unit):
 
 
 class Mill(Unit):
-    def __init__(self, IconPath: str, gameEnv: GameEnv):
+    def __init__(self, IconPath: str, gameEnv: AoE3Env):
         super(Mill, self).__init__("Mill", IconPath, gameEnv)
 
     def Improve(self):
         Hotkeys.SendHotKeys("Find Mill")
         self.gameEnv.InGameGui["OptionSlot0"].click()
+
+
+class SilverMine(Unit):
+    def __init__(self, gameEnv: AoE3Env):
+        super(SilverMine, self).__init__("SilverMine", "MapItems/SilverMineTiny.png", gameEnv)
 
 
 if __name__ == '__main__':

@@ -4,6 +4,8 @@ import time
 tempGroup = 9
 
 HandleToHotKeys: dict = {
+    "Deselect All": ["esc"],
+
     # Game world Hotkeys
     "Move Camera Left": ["left"],
     "Move Camera Right": ["right"],
